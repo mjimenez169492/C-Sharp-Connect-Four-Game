@@ -56,23 +56,50 @@ namespace connectFour
             playConnectFour();
         }
 
+        // constructor creates connectFour object with properties for player name, player symbol, player win state
+        public connectFour(String playerGameName, String playerGameSymbol, Boolean playerGameState)
+        {
+            playerName = playerGameName;
+            playerSymbol = playerGameSymbol;
+            playerWinState = playerGameState;
+        }
+
+        // property to get and set name of connectFour player object 
+        public String playerName { get; set; }
+
+        // property to get and set symbol of connectFour player object 
+        public String playerSymbol { get; set; }
+
+        // property to get and set current win state of connectFour player object 
+        public Boolean playerWinState { get; set; }
+
+        // method allows two players to play a game of Connect Four 
+        // connectFour objects created in this method are passed to subsequent methods
         public static void playConnectFour()
         {
+            // create 6 row by 7 column row 
             String[,] connect4Board = new String[6, 7];
 
+            // introduce players to Connect Four
             Console.Write("Connect Four is a chip dropping game that is usually played between two players.");
             Console.Write("Please register two players in order to play Connect Four.\n");
 
+            // prompt player one to enter their name
             Console.Write("Enter a name for Player One: ");
             String playerOneName = Console.ReadLine();
+
+            // prompt player two to enter their symbol
             Console.Write("Enter the symbol Player One will use: ");
             String playerOneSymbol = Console.ReadLine();
 
+            // create connectFour object for player one by passing the inputted name and symbol as arguements
             connectFour playerOne = new connectFour(playerOneName, playerOneSymbol, false);
 
+            // prompt player two to enter their name
             Console.Write("Enter a name for Player Two: ");
             String playerTwoName = Console.ReadLine();
 
+            // loop until the name entered by player two is not the same name picked by player one 
             while (playerTwoName.Equals(playerOneName))
             {
                 Console.Write("The name for Player Two cannot be the same as Player One!");
@@ -80,9 +107,11 @@ namespace connectFour
                 playerTwoName = Console.ReadLine();
             }
 
+            // prompt player two to enter their symbol
             Console.Write("Enter the symbol Player One will use: ");
             String playerTwoSymbol = Console.ReadLine();
 
+            // loop until the symbol entered by player two is not the same symbol picked by player one
             while (playerTwoSymbol.Equals(playerOneSymbol))
             {
                 Console.Write("The symbol for Player Two cannot be the same as Player One!");
@@ -90,24 +119,32 @@ namespace connectFour
                 playerTwoSymbol = Console.ReadLine();
             }
 
+            // create connectFour object for player two by passing the inputted name and symbol as arguements
             connectFour playerTwo = new connectFour(playerTwoName, playerTwoSymbol, false);
 
+            // pass player one. player two, and board for connect four as arguments 
             newConnectFourGame(playerOne, playerTwo, connect4Board);
         }
 
+        // method makes both players play Connect Four until certain conditions are met 
         public static void newConnectFourGame(connectFour playerOne, connectFour playerTwo, String[,] board)
         {
+            // initialize board values 
             newBoard(board);
 
+            // print out contents of the board
             printBoard(board);
 
-            while (playerOne.winState != true && playerTwo.winState != true)
+            // loop until player one or player two wins the game  
+            while (playerOne.playerWinState != true && playerTwo.playerWinState != true)
             {
+                // player one makes a move 
                 makeMove(playerOne, board);
 
+                // break if player one wins or board is full after a move was made 
                 if (checkIfWinner(playerOne, board) == true)
                 {
-                    playerOne.winState = true;
+                    playerOne.playerWinState = true;
                     break;
                 }
                 else if (fullBoard(board) == true)
@@ -115,11 +152,13 @@ namespace connectFour
                     break;
                 }
 
+                // player two makes a move 
                 makeMove(playerTwo, board);
 
+                // break if player two wins or board is full after a move was made 
                 if (checkIfWinner(playerTwo, board) == true)
                 {
-                    playerTwo.winState = true;
+                    playerTwo.playerWinState = true;
                     break;
                 }
                 else if (fullBoard(board) == true)
@@ -127,22 +166,12 @@ namespace connectFour
                     break;
                 }
             }
+
+            // determine winner of Connect Four game by passing player one and player two objects as arguments 
             gameState(playerOne, playerTwo);
         }
 
-        public connectFour(String playerGameName, String playerGameSymbol, Boolean gameWinner)
-        {
-            playerName = playerGameName;
-            playerSymbol = playerGameSymbol;
-            winState = gameWinner;
-        }
-
-        public String playerName { get; set; }
-
-        public String playerSymbol { get; set; }
-
-        public Boolean winState { get; set; }
-
+        // initialize new board by filling entire 2-Dimensional array with empty spaces
         public static void newBoard(String[,] board)
         {
             for (int i = 0; i < 6; i++)
@@ -154,16 +183,20 @@ namespace connectFour
             }
         }
 
+        // print out the contents of the board in a grid-like fashion
         public static void printBoard(String[,] board)
         {
-            Console.Write("Column:   0 1 2 3 4 5 6\n");
+            // print column positions of board 
+            Console.Write("\nColumn:   0 1 2 3 4 5 6\n");
 
             for (int i = 0; i < 6; i++)
             {
+                // print out row positions as i value iterates
                 Console.Write($"Row  {i}:  ");
 
                 for (int j = 0; j < 7; j++)
                 {
+                    // output board contents at position [i, j] 
                     if (j != board.Length - 1)
                     {
                         Console.Write($"|{board[i, j]}");
@@ -174,18 +207,24 @@ namespace connectFour
                         }
                     }
                 }
+                // print new line to form next row of board 
                 Console.WriteLine("");
             }
+            // print new line to improve board readability 
+            Console.WriteLine("");
         }
 
+        // return true if board is filled completely or false if it is not full yet 
         public static Boolean fullBoard(String[,] board)
         {
+            // int variable counter counts the number of spaces filled by a player symbol
             int counter = 0;
 
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 7; j++)
                 {
+                    // if space is occupied, increment counter by one
                     if(!board[i, j].Equals(" "))
                     {
                         counter++;
@@ -193,6 +232,7 @@ namespace connectFour
                 }
             }
 
+            // return true if board is filled completely
             if(counter == 42)
             {
                 return  true;
@@ -203,12 +243,16 @@ namespace connectFour
             }
         }
 
+        // player makes a move by placing their symbol in a column of the board 
         public static void makeMove(connectFour player, String[,] board)
         {
+            // prompt player to place their symbol in a column ranging from 0 to 6 whose values represent columns 1 to 7
             Console.Write($"Please select a column from 0 to 6 to place {player.playerSymbol} in {player.playerName}: ");
 
+            // store player input in string variable input
             String input = Console.ReadLine();
 
+            // loop until input is assigned a value ranging from 0 to 6 
             while (!input.Equals("0") && !input.Equals("1") && !input.Equals("2") && !input.Equals("3") &&
                 !input.Equals("4") && !input.Equals("5") && !input.Equals("6"))
             {
@@ -216,8 +260,11 @@ namespace connectFour
                 input = Console.ReadLine();
             }
 
+            // parse integer from String variable input and assign the integer value to int variable choice 
             int choice = int.Parse(input);
 
+            // if move is not valid, call method makeMove() and start method makeMove all over again
+            // else place player symbol in specified column of the board and print out the contents of the board 
             if (determineValidMove(choice, board) == false)
             {
                 makeMove(player, board);
@@ -229,14 +276,17 @@ namespace connectFour
             }
         }
 
+        // determine whether the column selected by the player to place their symbol in is full or not 
         public static Boolean determineValidMove(int choice, String[,] board)
         {
+            // initialize Boolean variable breakLoop to false 
             Boolean breakLoop = false;
 
             for (int i = 5; i >= 0; i--)
             {
                 for (int j = 6; j >= 0; j--)
                 {
+                    // if there is an empty space in the column chosen by the player, break the loop
                     if (board[i, choice].Equals(" "))
                     {
                         breakLoop = true;
@@ -249,6 +299,7 @@ namespace connectFour
                 }
             }
 
+            // if there is an empty space in the column chosen by the player, return true else return false
             if (breakLoop == true)
             {
                 return true;
@@ -260,6 +311,7 @@ namespace connectFour
             }
         }
 
+        // place player symbol in column of their choice 
         public static void playerMove(connectFour player, int choice, String[,] board)
         {
             Boolean breakLoop = false;
@@ -268,6 +320,7 @@ namespace connectFour
             {
                 for (int j = 6; j >= 0; j--)
                 {
+                    // assign player symmbol to board position [i,j] when an empty space in the chosen column is found
                     if (board[i, choice].Equals(" "))
                     {
                         board[i, choice] = player.playerSymbol;
@@ -275,8 +328,6 @@ namespace connectFour
                         break;
                     }
                 }
-
-                // why the additional condition: board[i, choice].Equals(player.playerSymbol)
                 if (breakLoop == true)
                 {
                     break;
@@ -284,6 +335,9 @@ namespace connectFour
             }
         }
 
+        // return true or false if player symbols on the board are arranged in a way that matches a win condition 
+        // 'check' methods cycle from bottom right to left and move up a row after last column is reached until 
+        // row 0 and column 0 are reached 
         public static Boolean checkIfWinner(connectFour player, String[,] board)
         {
             if(checkVertical(player, board) == true)
@@ -308,16 +362,18 @@ namespace connectFour
             }
         }
 
+        // determine which player is the winner and if there is no winner output that the game is a tie
+        // call restartGame() method to ask players if they wish to play again 
         public static void gameState(connectFour playerOne, connectFour playerTwo)
         {
-            if (playerOne.winState == true)
+            if (playerOne.playerWinState == true)
             {
                 Console.WriteLine($"Player {playerOne.playerName} has connected four pieces and won the game. Congratulations!");
                 restartGame(playerOne, playerTwo);
             }
-            else if (playerTwo.winState == true)
+            else if (playerTwo.playerWinState == true)
             {
-                Console.WriteLine($"Player {playerTwo.playerName} has connected four pieces and won the game. Congratulations {playerTwo}!");
+                Console.WriteLine($"Player {playerTwo.playerName} has connected four pieces and won the game. Congratulations!");
                 restartGame(playerOne, playerTwo);
             }
             else
@@ -327,15 +383,19 @@ namespace connectFour
             }
         }
 
+        // return true if four symbols of the player are stacked vertically on top of each other else return false
         public static Boolean checkVertical(connectFour player, String[,] board)
         {
+            // Boolean variable winner breaks for loops if four player symbols are stacked on one another
             Boolean winner = false;
 
+            // i loops only to 3 otherwise the subtraction of i by 1, 2, and 3 will cause an array out of bounds exception
+            // since it will prompt the method to search for a location that isn't present within the bounds of the board
             for (int i = 5; i >= 3; i--)
             {
                 for (int j = 6; j >= 0; j--)
                 {
-                    // dies if row is below 3
+                    // if statement triggers if there are four symbols on top of each other in the same column 
                     if (board[i, j].Equals(player.playerSymbol) &&
                         board[i - 1, j].Equals(player.playerSymbol) &&
                         board[i - 2, j].Equals(player.playerSymbol) &&
@@ -353,15 +413,20 @@ namespace connectFour
             return winner;
         }
 
+        // return true if four symbols of the player are placed in a row else return false
         public static Boolean checkHorizontal(connectFour player, String[,] board)
         {
+            // Boolean variable winner breaks for loops if four player symbols are placed in a row
             Boolean winner = false;
+
+            // j loops only to 3 otherwise the subtraction of j by 1, 2, and 3 will cause an array out of bounds exception
+            // since it will prompt the method to search for a location that isn't present within the bounds of the board
 
             for (int i = 5; i >= 0; i--)
             {
                 for (int j = 6; j >= 3; j--)
                 {
-                    // dies if below 3
+                    // if statement triggers if there are four symbols next to each other in the same row 
                     if (board[i, j].Equals(player.playerSymbol) &&
                         board[i, j - 1].Equals(player.playerSymbol) &&
                         board[i, j - 2].Equals(player.playerSymbol) &&
@@ -379,15 +444,20 @@ namespace connectFour
             return winner;
         }
 
+        // return true if four symbols of the player are placed in a leftward diagonal line else return false
         public static Boolean checkDiagonalLeft(connectFour player, String[,] board)
         {
+            // Boolean variable winner breaks for loops if four symbols are placed in a leftward diagonal line
             Boolean winner = false;
 
+            // i and j loop only to 3 otherwise the subtraction of i by 1, 2, and 3 and j by 1, 2, 3 will cause an array 
+            // out of bounds exception since it will prompt the method to search for a location that isn't present within 
+            // the bounds of the board 
             for (int i = 5; i >= 3; i--)
             {
                 for (int j = 6; j >= 3; j--)
                 {
-                    // die if (see i and j values and you will know why) <- prob due to cycling from bottom right
+                    // if statement triggers if there are four symbols placed in a leftward diagonal line 
                     if (board[i, j].Equals(player.playerSymbol) &&
                         board[i - 1, j - 1].Equals(player.playerSymbol) &&
                         board[i - 2, j - 2].Equals(player.playerSymbol) &&
@@ -405,15 +475,21 @@ namespace connectFour
             return winner;
         }
 
+        // return true if four symbols of the player are placed in a rightward diagonal line else return false
         public static Boolean checkDiagonalRight(connectFour player, String[,] board)
         {
+            // Boolean variable winner breaks for loops if four symbols are placed in a leftward diagonal line
             Boolean winner = false;
 
+            // i loops only to 3 otherwise the subtraction of i by 1, 2, and 3 will cause an array out of bounds exception
+            // since it will prompt the method to search for a location that isn't present within the bounds of the board
+            // j loops from 3 to 0 otherwise the addition of 1, 2, and 3 will cause an array out of bounds exception since
+            // it will prompt the method to search for a location that isn't present within the bounds of the board
             for (int i = 5; i >= 3; i--)
             {
                 for (int j = 3; j >= 0; j--)
                 {
-                    // die if (see i and j values and you will know why) <- prob due to cycling from bottom right
+                    // if statement triggers if there are four symbols placed in a rightward diagonal line 
                     if (board[i, j].Equals(player.playerSymbol) &&
                         board[i - 1, j + 1].Equals(player.playerSymbol) &&
                         board[i - 2, j + 2].Equals(player.playerSymbol) &&
@@ -431,27 +507,45 @@ namespace connectFour
             return winner;
         }
 
+        // ask players whether they want to play another round of Connect Four else the program will terminate 
         public static void restartGame(connectFour playerOne, connectFour playerTwo)
         {
+            // ask players if they want to play Connect Four again 
             Console.WriteLine("Would both players like to play Connect Four again?");
+
+            // prompt player one to respond
             Console.Write($"{playerOne.playerName}, enter 'y' for yes or 'n' for no: ");
 
+            // assign player one input to String variable playerOneChoice 
             String playerOneChoice = Console.ReadLine();
 
+            // assign lowercase version of letter if uppercase version is entered
             if (playerOneChoice.Equals("Y"))
             {
                 playerOneChoice = "y";
             }
+            else if (playerOneChoice.Equals("N"))
+            {
+                playerOneChoice = "n";
+            }
 
+            // prompt player two to respond
             Console.Write($"{playerTwo.playerName}, enter 'y' for yes or 'n' for no: ");
 
+            // assign player two input to String variable playerTwoChoice 
             String playerTwoChoice = Console.ReadLine();
 
+            // assign lowercase version of letter if uppercase version is entered
             if (playerTwoChoice.Equals("Y"))
             {
                 playerTwoChoice = "y";
             }
+            else if (playerTwoChoice.Equals("N"))
+            {
+                playerTwoChoice = "n";
+            }
 
+            // if both players agree to play again then play Connect Four again else terminate the program 
             if (playerOneChoice.Equals("y") && playerTwoChoice.Equals("y"))
             {
                 playConnectFour();
