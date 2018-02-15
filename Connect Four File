@@ -1,0 +1,469 @@
+/*
+    Due Feb 26 by 11:59pm  
+    Points 100  
+    Submitting a file upload  
+    	File Types zip 
+    Available Feb 12 at 12am - Feb 28 at 11:59pm 17 days
+
+                            Connect 4 Console Application
+
+Connect 4 is a game that is usually played between two players, in which players first 
+choose a color and take turns in dropping colored discs from the top into a 7 column, 
+six-row grid. The pieces fall down into any available spaces on the board. The first 
+player to form a horizontal, vertical or diagonal line of four of their disc is 
+considered to have won the game. 
+
+Your task is to implement a console-based application 
+for this game in C#. You will have to design and create the classes, structs and any 
+other objects you will need to fully implement the game. After a player takes his/her 
+turn, your app should display the current status of the board. When a player wins the 
+game, the app should report that and ask whether the players want to restart the game.
+
+At the start of the game, your app should request each player to provide their name 
+and a symbol to represent their disc on the board. The symbol can be any character 
+of their choice, as long as it is not the same as the other player’s.
+
+Your submission should be a zipped file containing the following:
+
+A Zipped file containing your project folder. This should include the solution files, 
+the project files as well as any class files created during the implementation.
+A report detailing your class diagram with all relevant attributes and methods from 
+which you implemented your code. It should include any enum and structs that you designed. 
+You may choose to design these classes using the free modeling tool StarUML, or Microsoft 
+Visio. Your report should include any challenges you faced, and any new technologies you 
+had to learn to implement this game. The filename for the report should follow this format: 
+<user-name>_project_<#>.pdf. The zipped file should be named following the structure 
+described in the course syllabus.
+
+Though this is an individual project, you are allowed discuss design ideas and 
+solutions with your mates. However, the implementations should be unique. As was 
+stated earlier, plagiarism will not be permitted.
+
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace connectFour
+{
+    public class connectFour
+    {
+        static void Main(string[] args)
+        {
+            playConnectFour();
+        }
+
+        public static void playConnectFour()
+        {
+            String[,] connect4Board = new String[6, 7];
+
+            Console.Write("Connect Four is a chip dropping game that is usually played between two players.");
+            Console.Write("Please register two players in order to play Connect Four.\n");
+
+            Console.Write("Enter a name for Player One: ");
+            String playerOneName = Console.ReadLine();
+            Console.Write("Enter the symbol Player One will use: ");
+            String playerOneSymbol = Console.ReadLine();
+
+            connectFour playerOne = new connectFour(playerOneName, playerOneSymbol, false);
+
+            Console.Write("Enter a name for Player Two: ");
+            String playerTwoName = Console.ReadLine();
+
+            while (playerTwoName.Equals(playerOneName))
+            {
+                Console.Write("The name for Player Two cannot be the same as Player One!");
+                Console.Write("Please enter a name for Player Two: ");
+                playerTwoName = Console.ReadLine();
+            }
+
+            Console.Write("Enter the symbol Player One will use: ");
+            String playerTwoSymbol = Console.ReadLine();
+
+            while (playerTwoSymbol.Equals(playerOneSymbol))
+            {
+                Console.Write("The symbol for Player Two cannot be the same as Player One!");
+                Console.Write("Please enter the symbol that Player Two will use: ");
+                playerTwoSymbol = Console.ReadLine();
+            }
+
+            connectFour playerTwo = new connectFour(playerTwoName, playerTwoSymbol, false);
+
+            newConnectFourGame(playerOne, playerTwo, connect4Board);
+        }
+
+        public static void newConnectFourGame(connectFour playerOne, connectFour playerTwo, String[,] board)
+        {
+            newBoard(board);
+
+            printBoard(board);
+
+            while (playerOne.winState != true && playerTwo.winState != true)
+            {
+                makeMove(playerOne, board);
+
+                if (checkIfWinner(playerOne, board) == true)
+                {
+                    playerOne.winState = true;
+                    break;
+                }
+                else if (fullBoard(board) == true)
+                {
+                    break;
+                }
+
+                makeMove(playerTwo, board);
+
+                if (checkIfWinner(playerTwo, board) == true)
+                {
+                    playerTwo.winState = true;
+                    break;
+                }
+                else if (fullBoard(board) == true)
+                {
+                    break;
+                }
+            }
+            gameState(playerOne, playerTwo);
+        }
+
+        public connectFour(String playerGameName, String playerGameSymbol, Boolean gameWinner)
+        {
+            playerName = playerGameName;
+            playerSymbol = playerGameSymbol;
+            winState = gameWinner;
+        }
+
+        public String playerName { get; set; }
+
+        public String playerSymbol { get; set; }
+
+        public Boolean winState { get; set; }
+
+        public static void newBoard(String[,] board)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    board[i, j] = " ";
+                }
+            }
+        }
+
+        public static void printBoard(String[,] board)
+        {
+            Console.Write("Column:   0 1 2 3 4 5 6\n");
+
+            for (int i = 0; i < 6; i++)
+            {
+                Console.Write($"Row  {i}:  ");
+
+                for (int j = 0; j < 7; j++)
+                {
+                    if (j != board.Length - 1)
+                    {
+                        Console.Write($"|{board[i, j]}");
+
+                        if (j == 6)
+                        {
+                            Console.Write("|");
+                        }
+                    }
+                }
+                Console.WriteLine("");
+            }
+        }
+
+        public static Boolean fullBoard(String[,] board)
+        {
+            int counter = 0;
+
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    if(!board[i, j].Equals(" "))
+                    {
+                        counter++;
+                    }
+                }
+            }
+
+            if(counter == 42)
+            {
+                return  true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static void makeMove(connectFour player, String[,] board)
+        {
+            Console.Write($"Please select a column from 0 to 6 to place {player.playerSymbol} in {player.playerName}: ");
+
+            String input = Console.ReadLine();
+
+            while (!input.Equals("0") && !input.Equals("1") && !input.Equals("2") && !input.Equals("3") &&
+                !input.Equals("4") && !input.Equals("5") && !input.Equals("6"))
+            {
+                Console.Write("Please enter a number from 0 to 6 in order to continue...");
+                input = Console.ReadLine();
+            }
+
+            int choice = int.Parse(input);
+
+            if (determineValidMove(choice, board) == false)
+            {
+                makeMove(player, board);
+            }
+            else
+            {
+                playerMove(player, choice, board);
+                printBoard(board);
+            }
+        }
+
+        public static Boolean determineValidMove(int choice, String[,] board)
+        {
+            Boolean breakLoop = false;
+
+            for (int i = 5; i >= 0; i--)
+            {
+                for (int j = 6; j >= 0; j--)
+                {
+                    if (board[i, choice].Equals(" "))
+                    {
+                        breakLoop = true;
+                        break;
+                    }
+                }
+                if (breakLoop == true)
+                {
+                    break;
+                }
+            }
+
+            if (breakLoop == true)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Error! Column {choice} is full!");
+                return false;
+            }
+        }
+
+        public static void playerMove(connectFour player, int choice, String[,] board)
+        {
+            Boolean breakLoop = false;
+
+            for (int i = 5; i >= 0; i--)
+            {
+                for (int j = 6; j >= 0; j--)
+                {
+                    if (board[i, choice].Equals(" "))
+                    {
+                        board[i, choice] = player.playerSymbol;
+                        breakLoop = true;
+                        break;
+                    }
+                }
+
+                // why the additional condition: board[i, choice].Equals(player.playerSymbol)
+                if (breakLoop == true)
+                {
+                    break;
+                }
+            }
+        }
+
+        public static Boolean checkIfWinner(connectFour player, String[,] board)
+        {
+            if(checkVertical(player, board) == true)
+            {
+                return true;
+            }
+            else if(checkHorizontal(player, board) == true)
+            {
+                return true;
+            }
+            else if (checkDiagonalLeft(player, board) == true)
+            {
+                return true;
+            }
+            else if (checkDiagonalRight(player, board) == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static void gameState(connectFour playerOne, connectFour playerTwo)
+        {
+            if (playerOne.winState == true)
+            {
+                Console.WriteLine($"Player {playerOne.playerName} has connected four pieces and won the game. Congratulations!");
+                restartGame(playerOne, playerTwo);
+            }
+            else if (playerTwo.winState == true)
+            {
+                Console.WriteLine($"Player {playerTwo.playerName} has connected four pieces and won the game. Congratulations {playerTwo}!");
+                restartGame(playerOne, playerTwo);
+            }
+            else
+            {
+                Console.WriteLine($"The board is full! This game is a tie!");
+                restartGame(playerOne, playerTwo);
+            }
+        }
+
+        public static Boolean checkVertical(connectFour player, String[,] board)
+        {
+            Boolean winner = false;
+
+            for (int i = 5; i >= 3; i--)
+            {
+                for (int j = 6; j >= 0; j--)
+                {
+                    // dies if row is below 3
+                    if (board[i, j].Equals(player.playerSymbol) &&
+                        board[i - 1, j].Equals(player.playerSymbol) &&
+                        board[i - 2, j].Equals(player.playerSymbol) &&
+                        board[i - 3, j].Equals(player.playerSymbol))
+                    {
+                        winner = true;
+                        break;
+                    }
+                }
+                if (winner == true)
+                {
+                    break;
+                }
+            }
+            return winner;
+        }
+
+        public static Boolean checkHorizontal(connectFour player, String[,] board)
+        {
+            Boolean winner = false;
+
+            for (int i = 5; i >= 0; i--)
+            {
+                for (int j = 6; j >= 3; j--)
+                {
+                    // dies if below 3
+                    if (board[i, j].Equals(player.playerSymbol) &&
+                        board[i, j - 1].Equals(player.playerSymbol) &&
+                        board[i, j - 2].Equals(player.playerSymbol) &&
+                        board[i, j - 3].Equals(player.playerSymbol))
+                    {
+                        winner = true;
+                        break;
+                    }
+                }
+                if (winner == true)
+                {
+                    break;
+                }
+            }
+            return winner;
+        }
+
+        public static Boolean checkDiagonalLeft(connectFour player, String[,] board)
+        {
+            Boolean winner = false;
+
+            for (int i = 5; i >= 3; i--)
+            {
+                for (int j = 6; j >= 3; j--)
+                {
+                    // die if (see i and j values and you will know why) <- prob due to cycling from bottom right
+                    if (board[i, j].Equals(player.playerSymbol) &&
+                        board[i - 1, j - 1].Equals(player.playerSymbol) &&
+                        board[i - 2, j - 2].Equals(player.playerSymbol) &&
+                        board[i - 3, j - 3].Equals(player.playerSymbol))
+                    {
+                        winner = true;
+                        break;
+                    }
+                }
+                if (winner == true)
+                {
+                    break;
+                }
+            }
+            return winner;
+        }
+
+        public static Boolean checkDiagonalRight(connectFour player, String[,] board)
+        {
+            Boolean winner = false;
+
+            for (int i = 5; i >= 3; i--)
+            {
+                for (int j = 3; j >= 0; j--)
+                {
+                    // die if (see i and j values and you will know why) <- prob due to cycling from bottom right
+                    if (board[i, j].Equals(player.playerSymbol) &&
+                        board[i - 1, j + 1].Equals(player.playerSymbol) &&
+                        board[i - 2, j + 2].Equals(player.playerSymbol) &&
+                        board[i - 3, j + 3].Equals(player.playerSymbol))
+                    {
+                        winner = true;
+                        break;
+                    }
+                }
+                if (winner == true)
+                {
+                    break;
+                }
+            }
+            return winner;
+        }
+
+        public static void restartGame(connectFour playerOne, connectFour playerTwo)
+        {
+            Console.WriteLine("Would both players like to play Connect Four again?");
+            Console.Write($"{playerOne.playerName}, enter 'y' for yes or 'n' for no: ");
+
+            String playerOneChoice = Console.ReadLine();
+
+            if (playerOneChoice.Equals("Y"))
+            {
+                playerOneChoice = "y";
+            }
+
+            Console.Write($"{playerTwo.playerName}, enter 'y' for yes or 'n' for no: ");
+
+            String playerTwoChoice = Console.ReadLine();
+
+            if (playerTwoChoice.Equals("Y"))
+            {
+                playerTwoChoice = "y";
+            }
+
+            if (playerOneChoice.Equals("y") && playerTwoChoice.Equals("y"))
+            {
+                playConnectFour();
+            }
+            else if(playerOneChoice.Equals("n") && playerTwoChoice.Equals("n"))
+            {
+                Console.WriteLine("The game is over! Program terminating...");
+            }
+            else
+            {
+                Console.WriteLine("Program terminating since both players have failed to reach an agreement...");
+            }
+        }
+    }
+}
